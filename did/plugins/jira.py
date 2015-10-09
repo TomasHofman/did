@@ -32,6 +32,7 @@ Notes:
 """
 
 from __future__ import absolute_import, unicode_literals
+from urlparse import urljoin
 
 import re
 import json
@@ -57,6 +58,7 @@ MAX_BATCHES = 100
 # Supported authentication types
 AUTH_TYPES = ["gss", "basic"]
 
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #  Issue Investigator
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -64,7 +66,7 @@ AUTH_TYPES = ["gss", "basic"]
 class Issue(object):
     """ Jira issue investigator """
 
-    def __init__(self, issue=None, prefix=None):
+    def __init__(self, issue=None, prefix=None, parent=None):
         """ Initialize issue """
         if issue is None:
             return
@@ -78,12 +80,18 @@ class Issue(object):
             self.prefix = prefix
         else:
             self.prefix = matched.groups()[0]
+        self.parent = parent
 
     def __unicode__(self):
         """ Jira key and summary for displaying """
         return "{0}-{1} - {2}".format(
             self.prefix, self.identifier.zfill(DEFAULT_WIDTH), self.summary)
 
+    @property
+    def url(self):
+        """ URL of the bug """
+        return urljoin(self.parent.url, 'browse/' + self.key)
+    
     @staticmethod
     def search(query, stats):
         """ Perform issue search for given stats instance """
@@ -107,7 +115,7 @@ class Issue(object):
             if len(issues) >= data["total"]:
                 break
         # Return the list of issue objects
-        return [Issue(issue, prefix=stats.parent.prefix) for issue in issues]
+        return [Issue(issue, prefix=stats.parent.prefix, parent=stats.parent) for issue in issues]
 
     def updated(self, user, options):
         """ True if the issue was commented by given user """

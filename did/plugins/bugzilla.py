@@ -36,6 +36,7 @@ Available options:
 """
 
 from __future__ import absolute_import, unicode_literals
+from urlparse import urljoin
 
 import bugzilla
 import xmlrpclib
@@ -147,6 +148,11 @@ class Bug(object):
             return "{0} [{1}]".format(
                 self.bug.summary, self.bug.resolution.lower())
         return self.bug.summary
+
+    @property
+    def url(self):
+        """ URL of the bug """
+        return urljoin(self.parent.url, 'show_bug.cgi?id=' + str(self.id))
 
     @property
     def logs(self):

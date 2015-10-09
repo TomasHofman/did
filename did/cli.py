@@ -76,6 +76,9 @@ class Options(object):
         group.add_argument(
             "--verbose", action="store_true",
             help="Include more details (like modified git directories)")
+        group.add_argument(
+            "--urls", action="store_true",
+            help="Include item's URLs")
 
         # Other options
         group = self.parser.add_argument_group("Utils")

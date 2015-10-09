@@ -100,6 +100,11 @@ class Stats(object):
         self.header()
         for stat in self.stats:
             utils.item(stat, level=1, options=self.options)
+            if self.options.urls:
+                try:
+                    utils.item(stat.url, level=2, options=self.options)
+                except AttributeError as e:
+                    log.debug('Plugin doesn\'t seem to support URLs: ' + unicode(e))
 
     def merge(self, other):
         """ Merge another stats. """
